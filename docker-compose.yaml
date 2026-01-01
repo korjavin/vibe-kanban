@@ -1,0 +1,24 @@
+services:
+  app:
+    image: ghcr.io/korjavin/vibe-kanban:latest
+    container_name: ${APP_NAME:-vibe-kanban}
+    restart: unless-stopped
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3000
+      # Add other environment variables here if needed
+      # - POSTHOG_API_KEY=...
+      # - POSTHOG_API_ENDPOINT=...
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${APP_NAME:-vibe-kanban}.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.${APP_NAME:-vibe-kanban}.entrypoints=websecure"
+      - "traefik.http.routers.${APP_NAME:-vibe-kanban}.tls.certresolver=myresolver"
+      - "traefik.http.services.${APP_NAME:-vibe-kanban}.loadbalancer.server.port=3000"
+
+networks:
+  proxy:
+    name: ${NETWORK}
+    external: true
