@@ -49,7 +49,16 @@ RUN apk add --no-cache \
     ca-certificates \
     tini \
     libgcc \
-    wget
+    wget \
+    bash \
+    git \
+    go \
+    nodejs \
+    npm \
+    github-cli
+
+# Install gemini-cli via npm
+RUN npm install -g gemini-chat-cli
 
 # Create app user for security
 RUN addgroup -g 1001 -S appgroup && \
