@@ -7,7 +7,12 @@ RUN apk add --no-cache \
     build-base \
     perl \
     openssl-dev \
-    pkgconfig
+    pkgconfig \
+    clang-dev \
+    llvm-dev
+
+# Allow linking libclang on musl (chef stage)
+ENV RUSTFLAGS="-C target-feature=-crt-static"
 
 # Planner stage
 FROM chef AS planner
