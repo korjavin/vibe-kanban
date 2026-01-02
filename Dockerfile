@@ -14,21 +14,21 @@ COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 
 # Final Builder stage
-FROM node:24-alpine AS builder
-# Install build dependencies
+# Use the SAME base image to ensure compatibility and path matching
+FROM chef AS builder
+
+# Install build dependencies (Node.js, build tools)
 RUN apk add --no-cache \
     curl \
     build-base \
     perl \
     llvm-dev \
-    clang-dev
+    clang-dev \
+    nodejs \
+    npm
 
 # Allow linking libclang on musl
 ENV RUSTFLAGS="-C target-feature=-crt-static"
-
-# Install Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
 
 ARG POSTHOG_API_KEY
 ARG POSTHOG_API_ENDPOINT
@@ -39,9 +39,10 @@ ENV VITE_PUBLIC_POSTHOG_HOST=$POSTHOG_API_ENDPOINT
 WORKDIR /app
 
 # Copy compiled dependencies from cacher
+# Since we use the same base image, paths like /usr/local/cargo match correctly
 COPY --from=cacher /app/target target
 COPY --from=cacher /app/target/release/deps target/release/deps
-COPY --from=cacher /root/.cargo /root/.cargo
+COPY --from=cacher /usr/local/cargo /usr/local/cargo
 
 # Copy package files for frontend
 COPY package*.json pnpm-lock.yaml pnpm-workspace.yaml ./
