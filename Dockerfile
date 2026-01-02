@@ -55,10 +55,11 @@ RUN apk add --no-cache \
     go \
     nodejs \
     npm \
+    # github-cli provides the 'gh' command
     github-cli
 
 # Install gemini-cli via npm
-RUN npm install -g gemini-chat-cli
+RUN npm install -g @google/gemini-cli
 
 # Create app user for security
 RUN addgroup -g 1001 -S appgroup && \
