@@ -94,7 +94,9 @@ RUN npm install -g @google/gemini-cli
 
 # Create app user for security
 RUN addgroup -g 1001 -S appgroup && \
-    adduser -u 1001 -S appuser -G appgroup
+    adduser -u 1001 -S appuser -G appgroup -h /home/appuser && \
+    mkdir -p /home/appuser/.config/gh /home/appuser/.gemini && \
+    chown -R appuser:appgroup /home/appuser
 
 # Copy binary from builder
 COPY --from=builder /app/target/release/server /usr/local/bin/server

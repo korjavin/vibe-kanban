@@ -11,6 +11,9 @@ services:
       # - POSTHOG_API_ENDPOINT=...
     networks:
       - proxy
+    volumes:
+      - gh_data:/home/appuser/.config/gh
+      - gemini_data:/home/appuser/.gemini
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.${APP_NAME:-vibe-kanban}.rule=Host(`${DOMAIN}`)"
@@ -25,3 +28,7 @@ networks:
   proxy:
     name: ${NETWORK}
     external: true
+
+volumes:
+  gh_data:
+  gemini_data:
