@@ -14,6 +14,7 @@ services:
     volumes:
       - gh_data:/home/appuser/.config/gh
       - gemini_data:/home/appuser/.gemini
+      - repos_data:/repos
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.${APP_NAME:-vibe-kanban}.rule=Host(`${DOMAIN}`)"
@@ -32,3 +33,4 @@ networks:
 volumes:
   gh_data:
   gemini_data:
+  repos_data:
