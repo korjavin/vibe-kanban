@@ -1,6 +1,13 @@
-# Base stage for cargo-chef
 FROM lukemathwalker/cargo-chef:latest-rust-alpine AS chef
 WORKDIR /app
+
+# Install build dependencies for openssl-sys (vendored)
+# perl is required for openssl configuration
+RUN apk add --no-cache \
+    build-base \
+    perl \
+    openssl-dev \
+    pkgconfig
 
 # Planner stage
 FROM chef AS planner
