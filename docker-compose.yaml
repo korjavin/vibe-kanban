@@ -17,6 +17,9 @@ services:
       - "traefik.http.routers.${APP_NAME:-vibe-kanban}.entrypoints=websecure"
       - "traefik.http.routers.${APP_NAME:-vibe-kanban}.tls.certresolver=myresolver"
       - "traefik.http.services.${APP_NAME:-vibe-kanban}.loadbalancer.server.port=3000"
+      # Conditional Auth Middleware
+      # Set AUTH_MIDDLEWARES=auth-errors@docker,forward-auth@docker in Portainer to enable
+      - "traefik.http.routers.${APP_NAME:-vibe-kanban}.middlewares=${AUTH_MIDDLEWARES}"
 
 networks:
   proxy:
