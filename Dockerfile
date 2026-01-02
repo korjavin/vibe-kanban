@@ -1,6 +1,20 @@
-# Build stage
-FROM node:24-alpine AS builder
+# Base stage for cargo-chef
+FROM lukemathwalker/cargo-chef:latest-rust-alpine AS chef
+WORKDIR /app
 
+# Planner stage
+FROM chef AS planner
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
+
+# Cache Builder stage
+FROM chef AS cacher
+COPY --from=planner /app/recipe.json recipe.json
+# Build dependencies - this is the cached layer
+RUN cargo chef cook --release --recipe-path recipe.json
+
+# Final Builder stage
+FROM node:24-alpine AS builder
 # Install build dependencies
 RUN apk add --no-cache \
     curl \
@@ -22,10 +36,14 @@ ARG POSTHOG_API_ENDPOINT
 ENV VITE_PUBLIC_POSTHOG_KEY=$POSTHOG_API_KEY
 ENV VITE_PUBLIC_POSTHOG_HOST=$POSTHOG_API_ENDPOINT
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files for dependency caching
+# Copy compiled dependencies from cacher
+COPY --from=cacher /app/target target
+COPY --from=cacher /app/target/release/deps target/release/deps
+COPY --from=cacher /root/.cargo /root/.cargo
+
+# Copy package files for frontend
 COPY package*.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY frontend/package*.json ./frontend/
 COPY npx-cli/package*.json ./npx-cli/
