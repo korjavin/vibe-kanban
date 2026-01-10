@@ -60,6 +60,7 @@ COPY --from=cacher /usr/local/cargo /usr/local/cargo
 COPY package*.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY frontend/package*.json ./frontend/
 COPY npx-cli/package*.json ./npx-cli/
+COPY patches/ ./patches/
 
 # Install pnpm and dependencies
 RUN npm install -g pnpm && pnpm install
